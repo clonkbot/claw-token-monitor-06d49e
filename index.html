@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦞</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CLAW Monitor | Token Launch Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --neon-cyan: #00f5ff;
+        --neon-magenta: #ff00ff;
+        --neon-yellow: #f0ff00;
+        --void-black: #030308;
+        --deep-purple: #0a0614;
+        --card-bg: rgba(10, 6, 20, 0.85);
+      }
+      
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--neon-cyan) var(--void-black);
+      }
+      
+      *::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      *::-webkit-scrollbar-track {
+        background: var(--void-black);
+      }
+      
+      *::-webkit-scrollbar-thumb {
+        background: var(--neon-cyan);
+        border-radius: 3px;
+      }
+      
+      body {
+        font-family: 'JetBrains Mono', monospace;
+        background: var(--void-black);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      
+      .font-orbitron {
+        font-family: 'Orbitron', sans-serif;
+      }
+      
+      .scanlines {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.15),
+          rgba(0, 0, 0, 0.15) 1px,
+          transparent 1px,
+          transparent 2px
+        );
+      }
+      
+      .grid-bg {
+        background-image: 
+          linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: grid-scroll 20s linear infinite;
+      }
+      
+      @keyframes grid-scroll {
+        0% { background-position: 0 0; }
+        100% { background-position: 50px 50px; }
+      }
+      
+      .neon-glow {
+        text-shadow: 
+          0 0 5px var(--neon-cyan),
+          0 0 10px var(--neon-cyan),
+          0 0 20px var(--neon-cyan),
+          0 0 40px var(--neon-cyan);
+      }
+      
+      .neon-glow-magenta {
+        text-shadow: 
+          0 0 5px var(--neon-magenta),
+          0 0 10px var(--neon-magenta),
+          0 0 20px var(--neon-magenta);
+      }
+      
+      .claw-scratch {
+        position: relative;
+      }
+      
+      .claw-scratch::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: -20px;
+        width: 15px;
+        height: 40px;
+        background: repeating-linear-gradient(
+          -15deg,
+          transparent,
+          transparent 2px,
+          var(--neon-cyan) 2px,
+          var(--neon-cyan) 4px
+        );
+        transform: translateY(-50%) skewX(-15deg);
+        opacity: 0.6;
+      }
+      
+      @keyframes token-enter {
+        0% {
+          opacity: 0;
+          transform: translateX(-100px) scale(0.8);
+          filter: blur(10px);
+        }
+        50% {
+          filter: blur(0);
+        }
+        100% {
+          opacity: 1;
+          transform: translateX(0) scale(1);
+        }
+      }
+      
+      @keyframes glitch {
+        0%, 100% { transform: translate(0); }
+        20% { transform: translate(-2px, 2px); }
+        40% { transform: translate(-2px, -2px); }
+        60% { transform: translate(2px, 2px); }
+        80% { transform: translate(2px, -2px); }
+      }
+      
+      @keyframes pulse-border {
+        0%, 100% { border-color: rgba(0, 245, 255, 0.3); }
+        50% { border-color: rgba(0, 245, 255, 0.8); }
+      }
+      
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+      }
+      
+      .token-card {
+        animation: token-enter 0.5s ease-out forwards;
+      }
+      
+      .token-card.new {
+        box-shadow: 
+          0 0 20px rgba(0, 245, 255, 0.4),
+          inset 0 0 20px rgba(0, 245, 255, 0.1);
+      }
+      
+      .token-card:hover {
+        animation: glitch 0.3s ease-in-out;
+      }
+      
+      .pulse-border {
+        animation: pulse-border 2s ease-in-out infinite;
+      }
+      
+      .claw-icon {
+        animation: float 3s ease-in-out infinite;
+      }
+      
+      .status-live {
+        animation: pulse-border 1s ease-in-out infinite;
+      }
+      
+      .gradient-text {
+        background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      .card-border {
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-magenta), var(--neon-cyan));
+        background-size: 200% 200%;
+        animation: gradient-shift 3s ease infinite;
+      }
+      
+      @keyframes gradient-shift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      
+      .noise-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9998;
+        opacity: 0.02;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scanlines"></div>
+    <div class="noise-overlay"></div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
